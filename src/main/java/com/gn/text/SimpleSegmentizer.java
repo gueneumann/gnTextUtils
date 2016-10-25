@@ -33,6 +33,14 @@ public class SimpleSegmentizer {
 
 	private List<String> tokenList = new ArrayList<String>();
 	private List<List<String>> sentenceList = new ArrayList<List<String>>();
+	
+	public SimpleSegmentizer(){
+	}
+	
+	public SimpleSegmentizer(boolean lowerCase, boolean splitString){
+		this.lowerCase = lowerCase;
+		this.splitString = splitString;
+	}
 
 	/*
 	 * The idea is to define to points s and e which define a possible span over the input string vector.
@@ -43,20 +51,42 @@ public class SimpleSegmentizer {
 
 	private String makeToken(int start, int end, boolean lowerCase){
 		int sl = Math.max(1, (end - start));
-		char c;
+		char c = '\0';
 		StringBuilder newToken = new StringBuilder(sl);
 
-		for (int i = start; i < sl; i++){
-			c = (lowerCase)?(Character.toLowerCase(this.inputString.charAt(i))):this.inputString.charAt(i);
+		for (int i = 0; i < sl; i++){
+			c = (lowerCase)?
+					(Character.toLowerCase(this.inputString.charAt(i+start))):
+						this.inputString.charAt(i+start);
 			newToken.append(c);
 		}	
-		return newToken.toString();
+		//String outputString = newToken.toString()+"["+(start)+":"+(start+sl)+"]";
+		String outputString = newToken.toString();
+		return outputString;
 	}
 
+	private String convertToCardinal(String newToken) {
+		return newToken+":card";
+	}
+
+	private String convertToOrdinal(String newToken) {
+		return newToken+":ord";
+	}
+
+	private String convertToCardinalAndOrdinal(String newToken) {
+		String cardinalString = newToken.substring(0, (1- newToken.length())) + ":card";
+		String ordinalString = newToken + ":ord";
+		return cardinalString+":or:"+ordinalString;
+	}
+	
+	public void reset (){
+		tokenList = new ArrayList<String>();
+		sentenceList = new ArrayList<List<String>>();
+	}
 	/*
 	 * This will be a loop which is terminated inside;
 	 */
-	public void scan (String inputString){
+	public void scanText (String inputString){
 		// Initialization
 		this.inputString = inputString;
 		int il = this.inputString.length();
@@ -66,15 +96,24 @@ public class SimpleSegmentizer {
 		int end = 0;
 		char c = '\0'; // used as dummy instead of nil or null
 
+		// System.err.println("String length: " + il);
+		
 		while(true){
+			// System.err.println("State " + state + " start: " + start + " end: " + end);
+			
 			if (end > il) break;
 
-			if (end != il) 
+			if (end == il) {
+				c  = '\0';
+			}
+			else {
 				c = this.inputString.charAt(end);
+			}
+
 
 			switch (state) {
 			// state actions
-			
+
 			case 1: // 1 is the character state, so most likely
 				if ((c == '\0') || this.tokenSepChars.contains(c)) {
 					String newToken = this.makeToken(start, end, lowerCase);
@@ -116,22 +155,208 @@ public class SimpleSegmentizer {
 					}
 				}
 				break;
-				
+
 			case 2: // state two: integer part of digit
-				// TODO
+				if ((c == '\0') || this.tokenSepChars.contains(c)){
+					String newToken = this.makeToken(start, end, lowerCase);
+					String cardinalString = convertToCardinal(newToken);
+					this.tokenList.add(cardinalString);
+					state = 0; start = (1+ end);	
+				}
+				else{
+					if (c == '.') {
+						state = 4;
+					}
+					else
+						if (c == ',') {
+							state = 3;
+						}
+						else
+							if (this.specialChars.contains(c)) {
+								String newToken = this.makeToken(start, end, lowerCase);
+								String cardinalString = convertToCardinal(newToken);
+								this.tokenList.add(cardinalString);
+								this.tokenList.add(Character.toString(c));
+								state = 0; start = (1+ end);
+							} 
+							else
+								if (Character.isDigit(c)) {
+								}
+								else
+								{
+									state = 1;
+								}
+
+				}
 				break;
+
 			case 3: // state three: floating point designated by #\,
+				if ((c == '\0') || this.tokenSepChars.contains(c)){
+					String newToken = this.makeToken(start, (1- end), lowerCase);
+					String cardinalString = convertToCardinal(newToken);
+					this.tokenList.add(cardinalString);
+					this.tokenList.add(",");
+					state = 0; start = (1+ end);	
+				}
+				else {
+					if (this.specialChars.contains(c)) {
+						String newToken = this.makeToken(start, (1- end), lowerCase);
+						String cardinalString = convertToCardinal(newToken);
+						this.tokenList.add(cardinalString);
+						this.tokenList.add(",");
+						this.tokenList.add(Character.toString(c));
+						state = 0; start = (1+ end);
+					} 
+					else {
+						if (Character.isDigit(c)) {
+							state = 5;
+						}
+						else 
+						{
+							String newToken = this.makeToken(start, (1- end), lowerCase);
+							String cardinalString = convertToCardinal(newToken);
+							this.tokenList.add(cardinalString);
+							this.tokenList.add(",");
+							state = 1; start = end;
+						}
+					}
+				}
 				break;
+
 			case 4: // state four: floating point designated by #\.
+				
+				if ((c == '\0')){
+					String newToken = this.makeToken(start, end, lowerCase);
+					String numberString = convertToCardinalAndOrdinal(newToken);
+					this.tokenList.add(numberString);
+					this.tokenList.add(".");
+					state = 0; start = end;
+				}
+				else {
+					if (this.tokenSepChars.contains(c)){
+						String newToken = this.makeToken(start, end, lowerCase);
+						String numberString = convertToOrdinal(newToken);
+						this.tokenList.add(numberString);
+						state = 0; start = (1+ end);	
+					}
+					else {
+						if (this.specialChars.contains(c)) {
+
+							String newToken = this.makeToken(start, end, lowerCase);
+							String numberString = convertToOrdinal(newToken);
+							this.tokenList.add(numberString);
+							this.tokenList.add(Character.toString(c));
+							state = 0; start = (1+ end);
+						}
+						else {
+							if (Character.isDigit(c)) {
+								state = 5;
+							}
+							else {
+								String newToken = this.makeToken(start, end, lowerCase);
+								String numberString = convertToOrdinal(newToken);
+								this.tokenList.add(numberString);
+								state = 1; start = end;
+							}
+						}
+					}
+				}
 				break;
+
 			case 5: // state five: digits
+				if ((c == '\0') || this.tokenSepChars.contains(c)){
+					String newToken = this.makeToken(start, end, lowerCase);
+					String cardinalString = convertToCardinal(newToken);
+					this.tokenList.add(cardinalString);
+					state = 0; start = (1+ end);	
+				}
+				else {
+					if (this.specialChars.contains(c)) {
+						String newToken = this.makeToken(start, end, lowerCase);
+						String cardinalString = convertToCardinal(newToken);
+						this.tokenList.add(cardinalString);
+						this.tokenList.add(Character.toString(c));
+						state = 0; start = (1+ end);
+					} 
+					else {
+						if (Character.isDigit(c)) {
+						}
+						else {
+							String newToken = this.makeToken(start, end, lowerCase);
+							String cardinalString = convertToCardinal(newToken);
+							this.tokenList.add(cardinalString);
+							state = 1; start = end;
+						}	
+					}
+				}
 				break;
+
 			case 6: // state six: handle delimiters like #\-
+				if ((c == '\0') || this.tokenSepChars.contains(c)){
+					String newToken = this.makeToken(start, (end - delimCnt), lowerCase);
+					this.tokenList.add(newToken);
+					state = 0; delimCnt = 0; start = (1+ end);	
+				}
+				else {
+					if (this.delimiterChars.contains(c)){
+						delimCnt++;
+					}
+					else {
+						if (this.specialChars.contains(c)) {
+							String newToken = this.makeToken(start, (end - delimCnt), lowerCase);
+							this.tokenList.add(newToken);
+							this.tokenList.add(Character.toString(c));
+							state = 0; delimCnt = 0; start = (1+ end);
+						}
+						else {
+							if (Character.isDigit(c)) {
+								state = 0;
+							}
+							else {
+								String newToken = this.makeToken(start, (end - delimCnt), lowerCase);
+								this.tokenList.add(newToken);
+								state = 1; delimCnt = 0; start = end;
+							}
+						}
+					}
+				}
 				break;
-
 			}
-
 			end++;
 		}
+	}
+
+	public String toString(){
+		String outputString = "";
+		int id = 0;
+		for (String token : this.tokenList){
+			outputString += token + " " ;
+			id++;
+		}
+		return outputString;
+
+	}
+
+	// TODO
+	// identify sentence boundary
+	// NOTE: what to do if we have no sentence boundary but only newline ?
+	// try some heuristics here
+	// thus make sure to collect some look-a-head elements before deciding when to create a sentence 
+	// also: capture some specific HTML patterns like "HTTP/1.1", cf. GarbageFilter
+	
+	public static void main(String[] args) throws Exception {
+		SimpleSegmentizer segmentizer = new SimpleSegmentizer(false, false);
+
+		String testString = "Der Abriss wird schätzungsweise etwa 40 Jahre dauern, sagt Dr. Günter Neumann, der 3. Reiter danach!"
+				;
+		long time1 = System.currentTimeMillis();
+		segmentizer.scanText(testString);
+		long time2 = System.currentTimeMillis();
+		System.out.println(segmentizer.toString());
+		segmentizer.reset();
+		segmentizer.scanText("Was ganz anderes.");
+		System.err.println("System time (msec): " + (time2-time1));
+
+		System.out.println(segmentizer.toString());
 	}
 }
