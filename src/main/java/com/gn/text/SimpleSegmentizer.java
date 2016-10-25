@@ -5,10 +5,10 @@ import java.util.Arrays;
 import java.util.List;
 
 /**
- * A reimplementation of our morphix-reader which is a very simple but easay and fast automaton for mapping a string into a list of tokens.
+ * A reimplementation of our morphix-reader which is a very simple but effective and fast automaton for mapping a string into a list of tokens.
  * It handles cardinals and ordinals and special chars between words.
  * Punctuation are also isolated as single strings so can be used to split the token list into a list of sentences.
- * Out put tokens can be low-concate or not.
+ * Output tokens can be lowCased or not.
  * Currently, developed for EN/DE like languages.
  * @author gune00
  *
@@ -18,7 +18,6 @@ public class SimpleSegmentizer {
 	// the last one should be #\^D, the Fill Down character
 	private List<Character> specialChars = 
 			Arrays.asList('.', ',', ';', '!', '?', ':', '(', ')', '{', '}', '[', ']', '$', '€', '\'', '\b'); 
-
 
 	private List<Character> delimiterChars = 
 			Arrays.asList('-', '_');
