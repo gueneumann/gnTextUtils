@@ -17,6 +17,13 @@ a useful set of text-oriented java utils
 
 ### Evaluation
 
+- currently it is reasonable fast:
+
+		running a DE cluebweb file without sentence boundary: 110921 msec
+		and with tokenization and sentence boundary: 		  119478 msec			 
+		
+		
+
 - for some text, run it with MorphAdorner
 
 - measure time 
