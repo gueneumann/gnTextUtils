@@ -18,7 +18,7 @@ public class SimpleSegmentizer {
 	// the last one should be #\^D, the Fill Down character
 	private List<Character> specialChars = 
 			Arrays.asList('.', ',', ';', '!', '?', ':', '(', ')', '{', '}', '[', ']', '$', '€', '\'', '\b'); 
-	
+
 	private List<Character> eosChars = 
 			Arrays.asList('.', '!', '?'); 
 
@@ -36,10 +36,10 @@ public class SimpleSegmentizer {
 	private String inputString = "";
 	private List<String> tokenList = new ArrayList<String>();
 	private List<List<String>> sentenceList = new ArrayList<List<String>>();
-	
+
 	public SimpleSegmentizer(){
 	}
-	
+
 	public SimpleSegmentizer(boolean lowerCase, boolean splitString){
 		this.lowerCase = lowerCase;
 		this.splitString = splitString;
@@ -61,7 +61,7 @@ public class SimpleSegmentizer {
 			c = (lowerCase)?
 					(Character.toLowerCase(this.inputString.charAt(i+start))):
 						this.inputString.charAt(i+start);
-			newToken.append(c);
+					newToken.append(c);
 		}	
 		//String outputString = newToken.toString()+"["+(start)+":"+(start+sl)+"]";
 		String outputString = newToken.toString();
@@ -83,17 +83,17 @@ public class SimpleSegmentizer {
 		String outputString = newToken;
 		return outputString;
 	}
-	
-	// TODO
-		// identify sentence boundary
-		// NOTE: what to do if we have no sentence boundary but only newline ?
-		// try some heuristics here
-		// thus make sure to collect some look-a-head elements before deciding when to create a sentence 
-		// also: capture some specific HTML patterns like "HTTP/1.1", cf. GarbageFilter
 
-	// TODO
-	// works but often not enough, e.g., when abrev is at end of sentence or token is larger than 2 chars, e.g.,
-	// bzw. sog. www. etc.
+	// TODO -> loosk already not that bad
+	// identify sentence boundary
+	// NOTE: what to do if we have no sentence boundary but only newline ?
+	// try some heuristics here
+	// thus make sure to collect some look-a-head elements before deciding when to create a sentence 
+	// also: capture some specific HTML patterns like "HTTP/1.1", cf. GarbageFilter
+
+	// works but often not enough, e.g., when abrev is at end of sentence or token is larger than 3 chars, e.g.,
+	// bzw. domainname . de -> . als sentence boundary
+	// I need left/right context
 	private void setCandidateAbrev(String token){
 		//System.err.println("Abrev? " + token);
 		if ((token.length() <= 3)
@@ -104,7 +104,7 @@ public class SimpleSegmentizer {
 			this.isCandidateAbrev = false;
 		//System.err.println("this.isCandidateAbrev=" + this.isCandidateAbrev);
 	}
-	
+
 	private void setCreateSentenceFlag(char c){
 		//System.err.println("Create sent: " + c);
 		if (this.eosChars.contains(c) &&
@@ -118,7 +118,7 @@ public class SimpleSegmentizer {
 		// reset sensible class parameters
 		this.createSentence = false;
 		this.tokenList = new ArrayList<String>();
-		
+
 	}
 	/*
 	 * This will be a loop which is terminated inside;
@@ -134,10 +134,10 @@ public class SimpleSegmentizer {
 		char c = '\0'; // used as dummy instead of nil or null
 
 		// System.err.println("String length: " + il);
-		
+
 		while(true){
 			//System.err.println("State " + state + " start: " + start + " end: " + end);
-			
+
 			if (end > il) break;
 
 			if (end == il) {
@@ -146,7 +146,7 @@ public class SimpleSegmentizer {
 			else {
 				c = this.inputString.charAt(end);
 			}
-			
+
 			if (this.createSentence) {
 				this.extendSentenceList();
 			}
@@ -272,7 +272,7 @@ public class SimpleSegmentizer {
 				break;
 
 			case 4: // state four: floating point designated by #\.
-				
+
 				if ((c == '\0')){
 					String newToken = this.makeToken(start, end, lowerCase);
 					String numberString = convertToCardinalAndOrdinal(newToken);
@@ -384,7 +384,7 @@ public class SimpleSegmentizer {
 		}
 		return outputString;
 	}
-	
+
 	public String sentenceListToString(){
 		String outputString = "";
 		int id = 0;
@@ -394,12 +394,12 @@ public class SimpleSegmentizer {
 		}
 		return outputString;
 	}
-	
+
 	public void reset (){
 		tokenList = new ArrayList<String>();
 		sentenceList = new ArrayList<List<String>>();
 	}
-	
+
 	public static void main(String[] args) throws Exception {
 		SimpleSegmentizer segmentizer = new SimpleSegmentizer(false, false);
 
@@ -408,14 +408,14 @@ public class SimpleSegmentizer {
 		long time2 = System.currentTimeMillis();
 		System.out.println(segmentizer.sentenceListToString());
 		System.err.println("System time (msec): " + (time2-time1));
-		
-		
+
+
 		segmentizer.reset();
 		segmentizer.scanText("Current immunosuppression protocols to prevent lung transplant rejection reduce pro-inflammatory and T-helper type 1 "
 				+ "(Th1) cytokines. However, Th1 T-cell pro-inflammatory cytokine production is important in host defense against bacterial "
 				+ "infection in the lungs. Excessive immunosuppression of Th1 T-cell pro-inflammatory cytokines leaves patients susceptible to infection.");
 		System.out.println(segmentizer.sentenceListToString());
-		
+
 		segmentizer.reset();
 		segmentizer.scanText("CELLULAR COMMUNICATIONS INC. sold 1,550,000 common shares at $21.75 each "
 				+ "yesterday, according to lead underwriter L.F. Rothschild & Co. . Doof ist das ! ");
