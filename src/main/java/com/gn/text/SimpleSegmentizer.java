@@ -31,6 +31,7 @@ public class SimpleSegmentizer {
 	private boolean splitString = false;
 	private boolean lowerCase = false;
 	private boolean createSentence = false;
+	private boolean isCandidateAbrev = false;
 
 	private String inputString = "";
 	private List<String> tokenList = new ArrayList<String>();
@@ -68,17 +69,19 @@ public class SimpleSegmentizer {
 	}
 
 	private String convertToCardinal(String newToken) {
-		return newToken+":card";
+		return newToken; //+":card";
 	}
 
 	private String convertToOrdinal(String newToken) {
-		return newToken+":ord";
+		return newToken; //+":ord";
 	}
 
 	private String convertToCardinalAndOrdinal(String newToken) {
-		String cardinalString = newToken.substring(0, (1- newToken.length())) + ":card";
-		String ordinalString = newToken + ":ord";
-		return cardinalString+":or:"+ordinalString;
+		String cardinalString = newToken.substring(0, (1- newToken.length()));
+		String ordinalString = newToken;
+		//String outputString = cardinalString+"card:or:ord:"+ordinalString;
+		String outputString = newToken;
+		return outputString;
 	}
 	
 	// TODO
@@ -88,9 +91,26 @@ public class SimpleSegmentizer {
 		// thus make sure to collect some look-a-head elements before deciding when to create a sentence 
 		// also: capture some specific HTML patterns like "HTTP/1.1", cf. GarbageFilter
 
+	// TODO
+	// works but often not enough, e.g., when abrev is at end of sentence or token is larger than 2 chars, e.g.,
+	// bzw. sog. www. etc.
+	private void setCandidateAbrev(String token){
+		System.err.println("Abrev? " + token);
+		if ((token.length() <= 3)
+				){
+			this.isCandidateAbrev = true;
+		}
+		else
+			this.isCandidateAbrev = false;
+		System.err.println("this.isCandidateAbrev=" + this.isCandidateAbrev);
+	}
+	
 	private void setCreateSentenceFlag(char c){
-		if (this.eosChars.contains(c))
+		System.err.println("Create sent: " + c);
+		if (this.eosChars.contains(c) &&
+				!this.isCandidateAbrev)
 			this.createSentence = true;
+		System.err.println("this.createSentence=" + this.createSentence);
 	}
 	private void extendSentenceList(){
 		// make a sentence
@@ -116,7 +136,7 @@ public class SimpleSegmentizer {
 		// System.err.println("String length: " + il);
 		
 		while(true){
-			// System.err.println("State " + state + " start: " + start + " end: " + end);
+			//System.err.println("State " + state + " start: " + start + " end: " + end);
 			
 			if (end > il) break;
 
@@ -149,6 +169,7 @@ public class SimpleSegmentizer {
 						if (this.specialChars.contains(c)) {
 							String newToken = this.makeToken(start, end, lowerCase);
 							this.tokenList.add(newToken);
+							this.setCandidateAbrev(newToken);
 							this.tokenList.add(Character.toString(c));
 							this.setCreateSentenceFlag(c);
 							state = 0; start = (1+ end);
@@ -165,6 +186,9 @@ public class SimpleSegmentizer {
 					if (this.specialChars.contains(c)){
 						String newToken = this.makeToken(start, end, lowerCase);
 						this.tokenList.add(newToken);
+						// newToken is a char-string like "!"
+						this.isCandidateAbrev = false;
+						this.setCreateSentenceFlag(c);
 						start++;
 					}
 					else {
@@ -379,16 +403,22 @@ public class SimpleSegmentizer {
 	public static void main(String[] args) throws Exception {
 		SimpleSegmentizer segmentizer = new SimpleSegmentizer(false, false);
 
-		String testString = "Der Abriss wird schätzungsweise etwa 40 Jahre dauern, sagt Dr. Günter Neumann, der 3. Reiter danach!"
-				;
 		long time1 = System.currentTimeMillis();
-		segmentizer.scanText(testString);
+		segmentizer.scanText("Der Abriss wird schätzungsweise etwa 40 Jahre dauern, sagt Dr. Günter Neumann, der 3. Reiter danach!");
 		long time2 = System.currentTimeMillis();
 		System.out.println(segmentizer.sentenceListToString());
-		segmentizer.reset();
-		segmentizer.scanText("Was ganz anderes.");
 		System.err.println("System time (msec): " + (time2-time1));
-
+		
+		
+		segmentizer.reset();
+		segmentizer.scanText("Current immunosuppression protocols to prevent lung transplant rejection reduce pro-inflammatory and T-helper type 1 "
+				+ "(Th1) cytokines. However, Th1 T-cell pro-inflammatory cytokine production is important in host defense against bacterial "
+				+ "infection in the lungs. Excessive immunosuppression of Th1 T-cell pro-inflammatory cytokines leaves patients susceptible to infection.");
+		System.out.println(segmentizer.sentenceListToString());
+		
+		segmentizer.reset();
+		segmentizer.scanText("CELLULAR COMMUNICATIONS INC. sold 1,550,000 common shares at $21.75 each "
+				+ "yesterday, according to lead underwriter L.F. Rothschild & Co. . Doof ist das ! ");
 		System.out.println(segmentizer.sentenceListToString());
 	}
 }
