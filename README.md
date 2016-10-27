@@ -19,7 +19,8 @@ a useful set of text-oriented java utils
 
 - currently it is reasonable fast:
 
-		running a DE cluebweb file without sentence boundary: 110921 msec
+		running a DE cluebweb file: 33974 WarcRecords; resulting text file: 12M tokens, 700K sentences 
+		without sentence boundary: 							  110921 msec
 		and with tokenization and sentence boundary: 		  119478 msec			 
 		
 		
