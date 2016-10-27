@@ -95,22 +95,22 @@ public class SimpleSegmentizer {
 	// works but often not enough, e.g., when abrev is at end of sentence or token is larger than 2 chars, e.g.,
 	// bzw. sog. www. etc.
 	private void setCandidateAbrev(String token){
-		System.err.println("Abrev? " + token);
+		//System.err.println("Abrev? " + token);
 		if ((token.length() <= 3)
 				){
 			this.isCandidateAbrev = true;
 		}
 		else
 			this.isCandidateAbrev = false;
-		System.err.println("this.isCandidateAbrev=" + this.isCandidateAbrev);
+		//System.err.println("this.isCandidateAbrev=" + this.isCandidateAbrev);
 	}
 	
 	private void setCreateSentenceFlag(char c){
-		System.err.println("Create sent: " + c);
+		//System.err.println("Create sent: " + c);
 		if (this.eosChars.contains(c) &&
 				!this.isCandidateAbrev)
 			this.createSentence = true;
-		System.err.println("this.createSentence=" + this.createSentence);
+		//System.err.println("this.createSentence=" + this.createSentence);
 	}
 	private void extendSentenceList(){
 		// make a sentence
