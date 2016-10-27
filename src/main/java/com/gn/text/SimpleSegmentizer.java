@@ -18,6 +18,9 @@ public class SimpleSegmentizer {
 	// the last one should be #\^D, the Fill Down character
 	private List<Character> specialChars = 
 			Arrays.asList('.', ',', ';', '!', '?', ':', '(', ')', '{', '}', '[', ']', '$', '€', '\'', '\b'); 
+	
+	private List<Character> eosChars = 
+			Arrays.asList('.', '!', '?'); 
 
 	private List<Character> delimiterChars = 
 			Arrays.asList('-', '_');
@@ -27,9 +30,9 @@ public class SimpleSegmentizer {
 
 	private boolean splitString = false;
 	private boolean lowerCase = false;
+	private boolean createSentence = false;
 
 	private String inputString = "";
-
 	private List<String> tokenList = new ArrayList<String>();
 	private List<List<String>> sentenceList = new ArrayList<List<String>>();
 	
@@ -78,9 +81,24 @@ public class SimpleSegmentizer {
 		return cardinalString+":or:"+ordinalString;
 	}
 	
-	public void reset (){
-		tokenList = new ArrayList<String>();
-		sentenceList = new ArrayList<List<String>>();
+	// TODO
+		// identify sentence boundary
+		// NOTE: what to do if we have no sentence boundary but only newline ?
+		// try some heuristics here
+		// thus make sure to collect some look-a-head elements before deciding when to create a sentence 
+		// also: capture some specific HTML patterns like "HTTP/1.1", cf. GarbageFilter
+
+	private void setCreateSentenceFlag(char c){
+		if (this.eosChars.contains(c))
+			this.createSentence = true;
+	}
+	private void extendSentenceList(){
+		// make a sentence
+		this.sentenceList.add(this.tokenList);
+		// reset sensible class parameters
+		this.createSentence = false;
+		this.tokenList = new ArrayList<String>();
+		
 	}
 	/*
 	 * This will be a loop which is terminated inside;
@@ -108,6 +126,10 @@ public class SimpleSegmentizer {
 			else {
 				c = this.inputString.charAt(end);
 			}
+			
+			if (this.createSentence) {
+				this.extendSentenceList();
+			}
 
 
 			switch (state) {
@@ -128,6 +150,7 @@ public class SimpleSegmentizer {
 							String newToken = this.makeToken(start, end, lowerCase);
 							this.tokenList.add(newToken);
 							this.tokenList.add(Character.toString(c));
+							this.setCreateSentenceFlag(c);
 							state = 0; start = (1+ end);
 						}
 					}
@@ -160,6 +183,7 @@ public class SimpleSegmentizer {
 					String newToken = this.makeToken(start, end, lowerCase);
 					String cardinalString = convertToCardinal(newToken);
 					this.tokenList.add(cardinalString);
+					this.setCreateSentenceFlag(c);
 					state = 0; start = (1+ end);	
 				}
 				else{
@@ -176,6 +200,7 @@ public class SimpleSegmentizer {
 								String cardinalString = convertToCardinal(newToken);
 								this.tokenList.add(cardinalString);
 								this.tokenList.add(Character.toString(c));
+								this.setCreateSentenceFlag(c);
 								state = 0; start = (1+ end);
 							} 
 							else
@@ -245,6 +270,7 @@ public class SimpleSegmentizer {
 							String numberString = convertToOrdinal(newToken);
 							this.tokenList.add(numberString);
 							this.tokenList.add(Character.toString(c));
+							this.setCreateSentenceFlag(c);
 							state = 0; start = (1+ end);
 						}
 						else {
@@ -275,6 +301,7 @@ public class SimpleSegmentizer {
 						String cardinalString = convertToCardinal(newToken);
 						this.tokenList.add(cardinalString);
 						this.tokenList.add(Character.toString(c));
+						this.setCreateSentenceFlag(c);
 						state = 0; start = (1+ end);
 					} 
 					else {
@@ -305,6 +332,7 @@ public class SimpleSegmentizer {
 							String newToken = this.makeToken(start, (end - delimCnt), lowerCase);
 							this.tokenList.add(newToken);
 							this.tokenList.add(Character.toString(c));
+							this.setCreateSentenceFlag(c);
 							state = 0; delimCnt = 0; start = (1+ end);
 						}
 						else {
@@ -325,23 +353,28 @@ public class SimpleSegmentizer {
 		}
 	}
 
-	public String toString(){
+	private String tokenListToString(List<String> tokenList){
+		String outputString = "";
+		for (String token : tokenList){
+			outputString += token + " " ;
+		}
+		return outputString;
+	}
+	
+	public String sentenceListToString(){
 		String outputString = "";
 		int id = 0;
-		for (String token : this.tokenList){
-			outputString += token + " " ;
+		for (List<String> tokenList : this.sentenceList){
+			outputString += id + ": " + this.tokenListToString(tokenList) + "\n";
 			id++;
 		}
 		return outputString;
-
 	}
-
-	// TODO
-	// identify sentence boundary
-	// NOTE: what to do if we have no sentence boundary but only newline ?
-	// try some heuristics here
-	// thus make sure to collect some look-a-head elements before deciding when to create a sentence 
-	// also: capture some specific HTML patterns like "HTTP/1.1", cf. GarbageFilter
+	
+	public void reset (){
+		tokenList = new ArrayList<String>();
+		sentenceList = new ArrayList<List<String>>();
+	}
 	
 	public static void main(String[] args) throws Exception {
 		SimpleSegmentizer segmentizer = new SimpleSegmentizer(false, false);
@@ -351,11 +384,11 @@ public class SimpleSegmentizer {
 		long time1 = System.currentTimeMillis();
 		segmentizer.scanText(testString);
 		long time2 = System.currentTimeMillis();
-		System.out.println(segmentizer.toString());
+		System.out.println(segmentizer.sentenceListToString());
 		segmentizer.reset();
 		segmentizer.scanText("Was ganz anderes.");
 		System.err.println("System time (msec): " + (time2-time1));
 
-		System.out.println(segmentizer.toString());
+		System.out.println(segmentizer.sentenceListToString());
 	}
 }
