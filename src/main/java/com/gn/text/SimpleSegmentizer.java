@@ -48,7 +48,7 @@ public class SimpleSegmentizer {
 	/*
 	 * The idea is to define to points s and e which define a possible span over the input string vector.
 	 * Depending on the type of char, a substring is extracted using current span information and a token is created.
-	 * By making a new string form the substring and eventually lowercase the char or not.
+	 * By making a new string form the substring and eventually lower-case the char or not.
 	 * Thus the input string should be processed as a global variable
 	 */
 
@@ -69,11 +69,11 @@ public class SimpleSegmentizer {
 	}
 
 	private String convertToCardinal(String newToken) {
-		return newToken; //+":card";
+		return newToken ; //+":card";
 	}
 
 	private String convertToOrdinal(String newToken) {
-		return newToken; //+":ord";
+		return newToken ;//+":ord";
 	}
 
 	private String convertToCardinalAndOrdinal(String newToken) {
@@ -123,6 +123,31 @@ public class SimpleSegmentizer {
 	/*
 	 * This will be a loop which is terminated inside;
 	 */
+	
+	/*
+	 * NOTE:
+	 * in state 2, the FST jumbs to state 3 and 4
+	 * to handle delimiters in numbers, as in 23.456 or 3,4e
+	 *.
+	 * The original morphix-reader jumped from 3 and 4 to state 5
+	 * if the char followed the delimiter is a number.
+	 * I think this is wrong, because it leads to a separation the numbers after all 1+ delimiters, e.g.,
+	 * 1,500,000 etc.
+	 * For that reason, I changed the FST so that it jumps back to state 2.
+	 * This will then keep all digits together, e.g., also in date like tokens of form: 
+	 * 23.10.2016 or 1.2.3.4.5. or 3,4,5,6,6
+	 * and will assigned them type :card or :ord
+	 * 
+	 * 
+	 * NOTE: this further means that state 5 is not used anymore.
+	 * 
+	 * TODO
+	 * I think it might not be so difficult to extend the FST to further subclassify
+	 * such "complex" numbers.
+	 * 
+	 * check e.g.,
+	 * 13 : 55 -> 13:55, 2001 / 2002 -> 2001/2002
+	 */
 	public void scanText (String inputString){
 		// Initialization
 		this.inputString = inputString;
@@ -133,10 +158,10 @@ public class SimpleSegmentizer {
 		int end = 0;
 		char c = '\0'; // used as dummy instead of nil or null
 
-		// System.err.println("String length: " + il);
+		// System.err.println("Input (#" + il + "): " + inputString);
 
 		while(true){
-			//System.err.println("State " + state + " start: " + start + " end: " + end);
+			// System.err.println("Start: " + start + " end: " + end + " State " + state +  " c: " + c);
 
 			if (end > il) break;
 
@@ -207,7 +232,6 @@ public class SimpleSegmentizer {
 					String newToken = this.makeToken(start, end, lowerCase);
 					String cardinalString = convertToCardinal(newToken);
 					this.tokenList.add(cardinalString);
-					this.setCreateSentenceFlag(c);
 					state = 0; start = (1+ end);	
 				}
 				else{
@@ -257,7 +281,9 @@ public class SimpleSegmentizer {
 					} 
 					else {
 						if (Character.isDigit(c)) {
-							state = 5;
+							// Why not state = 2 ?
+							// state = 5;
+							state = 2;
 						}
 						else 
 						{
@@ -299,7 +325,9 @@ public class SimpleSegmentizer {
 						}
 						else {
 							if (Character.isDigit(c)) {
-								state = 5;
+								// Why not state = 2 ?
+								// state = 5;
+								state = 2;
 							}
 							else {
 								String newToken = this.makeToken(start, end, lowerCase);
@@ -404,21 +432,22 @@ public class SimpleSegmentizer {
 		SimpleSegmentizer segmentizer = new SimpleSegmentizer(false, false);
 
 		long time1 = System.currentTimeMillis();
-		segmentizer.scanText("Der Abriss wird schätzungsweise etwa 40 Jahre dauern, sagt Dr. Günter Neumann, der 3. Reiter danach!");
-		long time2 = System.currentTimeMillis();
-		System.out.println(segmentizer.sentenceListToString());
-		System.err.println("System time (msec): " + (time2-time1));
-
-
-		segmentizer.reset();
-		segmentizer.scanText("Current immunosuppression protocols to prevent lung transplant rejection reduce pro-inflammatory and T-helper type 1 "
-				+ "(Th1) cytokines. However, Th1 T-cell pro-inflammatory cytokine production is important in host defense against bacterial "
-				+ "infection in the lungs. Excessive immunosuppression of Th1 T-cell pro-inflammatory cytokines leaves patients susceptible to infection.");
-		System.out.println(segmentizer.sentenceListToString());
+//		segmentizer.scanText("Der Abriss wird schätzungsweise etwa 40 Jahre dauern, sagt Dr. Günter Neumann, der 3. Reiter danach!");
+//		
+//		System.out.println(segmentizer.sentenceListToString());
+//
+//		segmentizer.reset();
+//		segmentizer.scanText("Current immunosuppression protocols to prevent lung transplant rejection reduce pro-inflammatory and T-helper type 1 "
+//				+ "(Th1) cytokines. However, Th1 T-cell pro-inflammatory cytokine production is important in host defense against bacterial "
+//				+ "infection in the lungs. Excessive immunosuppression of Th1 T-cell pro-inflammatory cytokines leaves patients susceptible to infection.");
+//		System.out.println(segmentizer.sentenceListToString());
 
 		segmentizer.reset();
 		segmentizer.scanText("CELLULAR COMMUNICATIONS INC. sold 1,550,000 common shares at $21.75 each "
 				+ "yesterday, according to lead underwriter L.F. Rothschild & Co. . Doof ist das ! ");
 		System.out.println(segmentizer.sentenceListToString());
+		
+		long time2 = System.currentTimeMillis();
+		System.err.println("System time (msec): " + (time2-time1));
 	}
 }
