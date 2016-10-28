@@ -31,4 +31,8 @@ a useful set of text-oriented java utils
 
 - measure difference
 
+## Deployment
+
 - eventually use it in NEMEX
+
+- use in GNT

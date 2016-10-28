@@ -158,10 +158,10 @@ public class SimpleSegmentizer {
 		int end = 0;
 		char c = '\0'; // used as dummy instead of nil or null
 
-		// System.err.println("Input (#" + il + "): " + inputString);
+		System.err.println("Input (#" + il + "): " + inputString);
 
 		while(true){
-			// System.err.println("Start: " + start + " end: " + end + " State " + state +  " c: " + c);
+			System.err.println("Start: " + start + " end: " + end + " State " + state +  " c: " + c);
 
 			if (end > il) break;
 
