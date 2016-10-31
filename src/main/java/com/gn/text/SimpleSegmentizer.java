@@ -36,10 +36,79 @@ public class SimpleSegmentizer {
 	private String inputString = "";
 	private List<String> tokenList = new ArrayList<String>();
 	private List<List<String>> sentenceList = new ArrayList<List<String>>();
-
-	public SimpleSegmentizer(){
+	
+	// getters and setters
+	public List<Character> getSpecialChars() {
+		return specialChars;
+	}
+	public void setSpecialChars(List<Character> specialChars) {
+		this.specialChars = specialChars;
+	}
+	public List<Character> getEosChars() {
+		return eosChars;
+	}
+	public void setEosChars(List<Character> eosChars) {
+		this.eosChars = eosChars;
+	}
+	public List<Character> getDelimiterChars() {
+		return delimiterChars;
+	}
+	public void setDelimiterChars(List<Character> delimiterChars) {
+		this.delimiterChars = delimiterChars;
+	}
+	public List<Character> getTokenSepChars() {
+		return tokenSepChars;
+	}
+	public void setTokenSepChars(List<Character> tokenSepChars) {
+		this.tokenSepChars = tokenSepChars;
+	}
+	public boolean isSplitString() {
+		return splitString;
+	}
+	public void setSplitString(boolean splitString) {
+		this.splitString = splitString;
+	}
+	public boolean isLowerCase() {
+		return lowerCase;
+	}
+	public void setLowerCase(boolean lowerCase) {
+		this.lowerCase = lowerCase;
+	}
+	public boolean isCreateSentence() {
+		return createSentence;
+	}
+	public void setCreateSentence(boolean createSentence) {
+		this.createSentence = createSentence;
+	}
+	public boolean isCandidateAbrev() {
+		return isCandidateAbrev;
+	}
+	public void setCandidateAbrev(boolean isCandidateAbrev) {
+		this.isCandidateAbrev = isCandidateAbrev;
+	}
+	public String getInputString() {
+		return inputString;
+	}
+	public void setInputString(String inputString) {
+		this.inputString = inputString;
+	}
+	public List<String> getTokenList() {
+		return tokenList;
+	}
+	public void setTokenList(List<String> tokenList) {
+		this.tokenList = tokenList;
+	}
+	public List<List<String>> getSentenceList() {
+		return sentenceList;
+	}
+	public void setSentenceList(List<List<String>> sentenceList) {
+		this.sentenceList = sentenceList;
 	}
 
+	// Init classes
+	public SimpleSegmentizer(){
+	}
+	
 	public SimpleSegmentizer(boolean lowerCase, boolean splitString){
 		this.lowerCase = lowerCase;
 		this.splitString = splitString;
@@ -158,10 +227,10 @@ public class SimpleSegmentizer {
 		int end = 0;
 		char c = '\0'; // used as dummy instead of nil or null
 
-		System.err.println("Input (#" + il + "): " + inputString);
+		// System.err.println("Input (#" + il + "): " + inputString);
 
 		while(true){
-			System.err.println("Start: " + start + " end: " + end + " State " + state +  " c: " + c);
+			// System.err.println("Start: " + start + " end: " + end + " State " + state +  " c: " + c);
 
 			if (end > il) break;
 
@@ -405,7 +474,7 @@ public class SimpleSegmentizer {
 		}
 	}
 
-	private String tokenListToString(List<String> tokenList){
+	public String tokenListToString(List<String> tokenList){
 		String outputString = "";
 		for (String token : tokenList){
 			outputString += token + " " ;
