@@ -59,6 +59,14 @@
 			<artifactId>commons-csv</artifactId>
 			<version>1.2</version>
 		</dependency>
+
+		<!--  Needed for 7z files: http://commons.apache.org/proper/commons-compress/limitations.html -->
+		<dependency>
+			<groupId>org.tukaani</groupId>
+			<artifactId>xz</artifactId>
+			<version>1.5</version>
+		</dependency>
+
 		<!-- END: Handling CVS files -->
 
 		<!-- Begin: Jetty, Jackson, Jersey RESTfull web service stuff -->
