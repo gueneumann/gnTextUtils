@@ -131,7 +131,7 @@ package com.gn.similarity;
 	     */
 	    public static void main(String[] args) {
 	    	String s = "hausern";
-	        String t = "haus";
+	        String t = "gehaus";
 	        System.out.println("'" + lcs(s, t) + "'");
 	    }
 	}
