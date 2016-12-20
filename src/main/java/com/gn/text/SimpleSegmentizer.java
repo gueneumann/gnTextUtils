@@ -36,7 +36,7 @@ public class SimpleSegmentizer {
 	private String inputString = "";
 	private List<String> tokenList = new ArrayList<String>();
 	private List<List<String>> sentenceList = new ArrayList<List<String>>();
-	
+
 	// getters and setters
 	public List<Character> getSpecialChars() {
 		return specialChars;
@@ -108,7 +108,7 @@ public class SimpleSegmentizer {
 	// Init classes
 	public SimpleSegmentizer(){
 	}
-	
+
 	public SimpleSegmentizer(boolean lowerCase, boolean splitString){
 		this.lowerCase = lowerCase;
 		this.splitString = splitString;
@@ -138,19 +138,19 @@ public class SimpleSegmentizer {
 	}
 
 	private String convertToCardinal(String newToken) {
-		return newToken ; //+":card";
+		return newToken; // +":CARD";
 	}
 
 	private String convertToOrdinal(String newToken) {
-		return newToken ;//+":ord";
+		return newToken; //+":ORD";
 	}
 
 	private String convertToCardinalAndOrdinal(String newToken) {
-//		System.out.println("AAA:" + newToken+":AAA");
-//		String cardinalString = newToken.substring(0, (newToken.length() - 1));
-//		String ordinalString = newToken;
-//		String outputString = cardinalString+"card:or:ord:"+ordinalString;
-		String outputString = newToken;
+		//		System.out.println("AAA:" + newToken+":AAA");
+		//		String cardinalString = newToken.substring(0, (newToken.length() - 1));
+		//		String ordinalString = newToken;
+		//		String outputString = cardinalString+"card:or:ord:"+ordinalString;
+		String outputString = newToken ; //+":CARDORD";
 		return outputString;
 	}
 
@@ -176,11 +176,11 @@ public class SimpleSegmentizer {
 	}
 
 	private void setCreateSentenceFlag(char c){
-		//System.err.println("Create sent: " + c);
+		//		System.err.println("Create sent: " + c);
 		if (this.eosChars.contains(c) &&
 				!this.isCandidateAbrev)
 			this.createSentence = true;
-		//System.err.println("this.createSentence=" + this.createSentence);
+		//		System.err.println("this.createSentence=" + this.createSentence);
 	}
 	private void extendSentenceList(){
 		// make a sentence
@@ -193,7 +193,7 @@ public class SimpleSegmentizer {
 	/*
 	 * This will be a loop which is terminated inside;
 	 */
-	
+
 	/*
 	 * NOTE:
 	 * in state 2, the FST jumbs to state 3 and 4
@@ -231,9 +231,14 @@ public class SimpleSegmentizer {
 		// System.err.println("Input (#" + il + "): " + inputString);
 
 		while(true){
-			// System.err.println("Start: " + start + " end: " + end + " State " + state +  " c: " + c);
+			//System.err.println("Start: " + start + " end: " + end + " State " + state +  " c: " + c);
 
-			if (end > il) break;
+			if (end > il) {
+				if (this.createSentence) {
+					this.extendSentenceList();
+				}
+				break;
+			}
 
 			if (end == il) {
 				c  = '\0';
@@ -274,27 +279,31 @@ public class SimpleSegmentizer {
 				break;
 
 			case 0: // state zero covers: space, tab, specials
-				if ((c == '\0') || this.tokenSepChars.contains(c)) {
+				if (this.tokenSepChars.contains(c)) {
 					start++;
 				}
-				else {
-					if (this.specialChars.contains(c)){
-						String newToken = this.makeToken(start, end, lowerCase);
-						this.tokenList.add(newToken);
-						// newToken is a char-string like "!"
-						this.isCandidateAbrev = false;
-						this.setCreateSentenceFlag(c);
-						start++;
+				else
+					if ((c == '\0')) {
+						this.createSentence=true;
 					}
 					else {
-						if (Character.isDigit(c)) {
-							state = 2;
+						if (this.specialChars.contains(c)){
+							String newToken = this.makeToken(start, end, lowerCase);
+							this.tokenList.add(newToken);
+							// newToken is a char-string like "!"
+							this.isCandidateAbrev = false;
+							this.setCreateSentenceFlag(c);
+							start++;
 						}
 						else {
-							state = 1;
+							if (Character.isDigit(c)) {
+								state = 2;
+							}
+							else {
+								state = 1;
+							}
 						}
 					}
-				}
 				break;
 
 			case 2: // state two: integer part of digit
@@ -374,7 +383,8 @@ public class SimpleSegmentizer {
 					String numberString = convertToCardinalAndOrdinal(newToken);
 					this.tokenList.add(numberString);
 					this.tokenList.add(".");
-					state = 0; start = end;
+					this.createSentence = true;
+					state = 0; start = (1+ end);
 				}
 				else {
 					if (this.tokenSepChars.contains(c)){
@@ -487,8 +497,10 @@ public class SimpleSegmentizer {
 		String outputString = "";
 		int id = 0;
 		for (List<String> tokenList : this.sentenceList){
-			outputString += id + ": " + this.tokenListToString(tokenList) + "\n";
-			id++;
+			if (!tokenList.isEmpty()){
+				outputString += id + ": " + this.tokenListToString(tokenList) + "\n";
+				id++;
+			}
 		}
 		return outputString;
 	}
@@ -502,11 +514,11 @@ public class SimpleSegmentizer {
 		SimpleSegmentizer segmentizer = new SimpleSegmentizer(false, false);
 
 		long time1 = System.currentTimeMillis();
-//		segmentizer.scanText("Der Abriss wird schätzungsweise etwa 40 Jahre dauern, sagt Dr. Günter Neumann, der 3. Reiter danach!");
-//		
-//		System.out.println(segmentizer.sentenceListToString());
-//
-//		segmentizer.reset();
+		//		segmentizer.scanText("Der Abriss wird schätzungsweise etwa 40 Jahre dauern, sagt Dr. Günter Neumann, der 3. Reiter danach!");
+		//		
+		//		System.out.println(segmentizer.sentenceListToString());
+		//
+		//		segmentizer.reset();
 		segmentizer.scanText("Current immunosuppression protocols to prevent lung transplant rejection reduce pro-inflammatory and T-helper type 1 "
 				+ "(Th1) cytokines. However, Th1 T-cell pro-inflammatory cytokine production is important in host defense against bacterial "
 				+ "infection in the lungs. Excessive immunosuppression of Th1 T-cell pro-inflammatory cytokines leaves patients susceptible to infection.");
@@ -514,9 +526,9 @@ public class SimpleSegmentizer {
 
 		segmentizer.reset();
 		segmentizer.scanText("CELLULAR COMMUNICATIONS INC. sold 1,550,000 common shares at $21.75 each "
-				+ "yesterday, according to lead underwriter L.F. Rothschild & Inc. Der 3. Mann geht nahc hause.");
+				+ "yesterday, according to lead underwriter L.F. Rothschild & Inc. . Der 3.        Mann geht nahc hause 3. Und was macht er denn daheim? Weiss mnicht, weisst du es ? Wieso nicht?    Weil    .");
 		System.out.println(segmentizer.sentenceListToString());
-		
+
 		long time2 = System.currentTimeMillis();
 		System.err.println("System time (msec): " + (time2-time1));
 	}
