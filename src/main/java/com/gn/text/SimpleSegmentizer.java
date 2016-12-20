@@ -146,9 +146,10 @@ public class SimpleSegmentizer {
 	}
 
 	private String convertToCardinalAndOrdinal(String newToken) {
-		String cardinalString = newToken.substring(0, (1- newToken.length()));
-		String ordinalString = newToken;
-		//String outputString = cardinalString+"card:or:ord:"+ordinalString;
+//		System.out.println("AAA:" + newToken+":AAA");
+//		String cardinalString = newToken.substring(0, (newToken.length() - 1));
+//		String ordinalString = newToken;
+//		String outputString = cardinalString+"card:or:ord:"+ordinalString;
 		String outputString = newToken;
 		return outputString;
 	}
@@ -506,14 +507,14 @@ public class SimpleSegmentizer {
 //		System.out.println(segmentizer.sentenceListToString());
 //
 //		segmentizer.reset();
-//		segmentizer.scanText("Current immunosuppression protocols to prevent lung transplant rejection reduce pro-inflammatory and T-helper type 1 "
-//				+ "(Th1) cytokines. However, Th1 T-cell pro-inflammatory cytokine production is important in host defense against bacterial "
-//				+ "infection in the lungs. Excessive immunosuppression of Th1 T-cell pro-inflammatory cytokines leaves patients susceptible to infection.");
-//		System.out.println(segmentizer.sentenceListToString());
+		segmentizer.scanText("Current immunosuppression protocols to prevent lung transplant rejection reduce pro-inflammatory and T-helper type 1 "
+				+ "(Th1) cytokines. However, Th1 T-cell pro-inflammatory cytokine production is important in host defense against bacterial "
+				+ "infection in the lungs. Excessive immunosuppression of Th1 T-cell pro-inflammatory cytokines leaves patients susceptible to infection.");
+		System.out.println(segmentizer.sentenceListToString());
 
 		segmentizer.reset();
 		segmentizer.scanText("CELLULAR COMMUNICATIONS INC. sold 1,550,000 common shares at $21.75 each "
-				+ "yesterday, according to lead underwriter L.F. Rothschild & Co. . Doof ist das ! ");
+				+ "yesterday, according to lead underwriter L.F. Rothschild & Inc. Der 3. Mann geht nahc hause.");
 		System.out.println(segmentizer.sentenceListToString());
 		
 		long time2 = System.currentTimeMillis();
