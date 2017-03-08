@@ -115,7 +115,7 @@ public class SimpleSegmentizer {
 	}
 
 	/*
-	 * The idea is to define to points s and e which define a possible span over the input string vector.
+	 * The idea is to define two points s and e which define a possible span over the input string vector.
 	 * Depending on the type of char, a substring is extracted using current span information and a token is created.
 	 * By making a new string form the substring and eventually lower-case the char or not.
 	 * Thus the input string should be processed as a global variable
@@ -512,13 +512,13 @@ public class SimpleSegmentizer {
 
 	public static void main(String[] args) throws Exception {
 		SimpleSegmentizer segmentizer = new SimpleSegmentizer(false, false);
-
+		
 		long time1 = System.currentTimeMillis();
-		//		segmentizer.scanText("Der Abriss wird schätzungsweise etwa 40 Jahre dauern, sagt Dr. Günter Neumann, der 3. Reiter danach!");
-		//		
-		//		System.out.println(segmentizer.sentenceListToString());
-		//
-		//		segmentizer.reset();
+		segmentizer.scanText("Der Abriss wird schätzungsweise etwa 40 Jahre dauern, sagt Dr. Günter Neumann, der 3. Reiter danach! Alleh hopp noch e mal.");
+
+		System.out.println(segmentizer.sentenceListToString());
+
+		segmentizer.reset();
 		segmentizer.scanText("Current immunosuppression protocols to prevent lung transplant rejection reduce pro-inflammatory and T-helper type 1 "
 				+ "(Th1) cytokines. However, Th1 T-cell pro-inflammatory cytokine production is important in host defense against bacterial "
 				+ "infection in the lungs. Excessive immunosuppression of Th1 T-cell pro-inflammatory cytokines leaves patients susceptible to infection.");
