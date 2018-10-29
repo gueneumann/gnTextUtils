@@ -20,7 +20,7 @@
 		<maven.compiler.target>1.7</maven.compiler.target>
 
 		<!-- Adapt this to a version found on http://central.maven.org/maven2/org/eclipse/jetty/jetty-maven-plugin/ -->
-		<jettyVersion>9.2.15.v20160210</jettyVersion>
+		<jettyVersion>9.4.12.v20180830</jettyVersion>
 
 		<!-- https://jersey.java.net/documentation/latest/modules-and-dependencies.html#servlet-app-glassfish -->
 		<jerseyVersion>2.22.2</jerseyVersion>
