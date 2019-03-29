@@ -188,7 +188,7 @@ public class SuffixArray {
 	 * Unit tests the <tt>SuffixArray</tt> data type.
 	 */
 	public static void main(String[] args) {
-		String s = "akrakadabra";
+		String s = "akrakadabra Günter Neumann DFKI GmbH";
 		SuffixArray suffix = new SuffixArray(s);
 
 		// StdOut.println("rank(" + args[0] + ") = " + suffix.rank(args[0]));

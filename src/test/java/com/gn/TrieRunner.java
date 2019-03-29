@@ -1,6 +1,7 @@
-package com.gn.trie;
+package com.gn;
 
 import com.gn.trie.Trie;
+import com.gn.trie.TrieDictionaryFileReader;
 import com.gn.trie.TrieDictionaryFileReader.DictType;
 
 public class TrieRunner {
@@ -98,10 +99,11 @@ public class TrieRunner {
 
 		time1 = System.currentTimeMillis();
 
-		dict.getTrie().getSubstringLongestMatch(
-				"Günter Neumann works at DFKI with Josef and all others.", 
+		System.out.println(dict.getTrie().getSubstringLongestMatch(
+				"Günter Neumann works at DFKI with Josef and all others. Quentin Metsys the Younger is in WikiPerson list,", 
 				false,
-				false);
+				false)
+				);
 
 		time2 = System.currentTimeMillis();
 		System.out.println("System time (msec): " + (time2-time1));
@@ -113,7 +115,7 @@ public class TrieRunner {
 
 		dict.initDictWithFile(
 				//"/Users/gune00/dfki/workspaceKepler/nemexa/src/main/webapp/resources/MedicalTerms-mwl-plain.txt",
-				"/Users/gune00/dfki/workspaceKepler/nemex/src/main/webapp/resources/GeneLexicon-mwl-plain.txt",
+				"/Users/gune00/data/GeneLexicon-mwl-plain.txt",
 				"NO", 
 				DictType.NEMEX,
 				false

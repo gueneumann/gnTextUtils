@@ -130,8 +130,8 @@ package com.gn.similarity;
 	     * standard output.
 	     */
 	    public static void main(String[] args) {
-	    	String s = "hausern";
-	        String t = "gehaus";
+	    	String s = "We present a novel approach for relation classification using attention mechanisms on top of token embeddings computed by ELMo.";
+	        String t = "Our proposed approach consists of separating the entities taking part in a relation from its context and use the entities to pay attention to the context. We add the retrieved information on top of the entities and use that enriched abstraction to classify the relations";
 	        System.out.println("'" + lcs(s, t) + "'");
 	    }
 	}
