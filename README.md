@@ -40,3 +40,15 @@ a useful set of text-oriented java utils
 ## Testing TrieDirectoryRunner with Amplexor data:
 
 - takes about 17 seconds to run whole corpus
+
+- next write out found entries per file
+
+- Abgleichen mit W. Daten
+
+- more tests with trie
+
+- check isValidEntry also numbers
+
+- handle prober treatment of lower case 
+
+- add edit distance function

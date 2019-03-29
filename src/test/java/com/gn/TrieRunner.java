@@ -115,7 +115,7 @@ public class TrieRunner {
 
 		dict.initDictWithFile(
 				//"/Users/gune00/dfki/workspaceKepler/nemexa/src/main/webapp/resources/MedicalTerms-mwl-plain.txt",
-				"/Users/gune00/data/GeneLexicon-mwl-plain.txt",
+				"/local/data/GeneLexicon-mwl-plain.txt",
 				"NO", 
 				DictType.NEMEX,
 				false
@@ -155,7 +155,7 @@ public class TrieRunner {
 						+ "one duplication event that occurred before the divergence of rice and barley ."
 						+ "Additional duplications appear to have occurred within each of the species .", 
 						false,
-						false)
+						true)
 				);
 
 		time2 = System.currentTimeMillis();

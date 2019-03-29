@@ -1,10 +1,15 @@
 package com.gn;
 
 import java.io.BufferedReader;
+import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.io.OutputStreamWriter;
+import java.util.Map;
+import java.util.TreeMap;
 
 import com.gn.trie.TrieDictionaryFileReader;
 import com.gn.trie.TrieDictionaryFileReader.DictType;
@@ -38,6 +43,8 @@ public class TrieDirectoryRunner {
 
 	public String dictionary = "/local/data/AmplexorData/CSD_Data_Delivery_v1/Controlled_Vocabulary/entriesType-nemex.txt";
 	
+	public String outFile = "/local/data/AmplexorData/EMA_EPAR_trieMatches.txt";
+	
 	public TrieDictionaryFileReader trie = new TrieDictionaryFileReader();
 
 	public TrieDirectoryRunner() {
@@ -69,8 +76,37 @@ public class TrieDirectoryRunner {
 		time2 = System.currentTimeMillis();
 		System.out.println("System time (msec): " + (time2 - time1));
 	}
+	
+	private TreeMap<Integer,TreeMap<Integer,String>> queryWithTrie(String dictionary2, String line) {
+		return trie.getTrie().getSubstringLongestMatch(line, false, false);	
+		
+	}
+	
+	/*
+	 * Given the output of the trie matcher which is a map of start and (end type) entries,
+	 * write out all found entries for each line in the form:
+	 * <line> "the sentence"
+	 * (<substring:type>* each line with a found substring start,end and its type or NOTHING
+	 * newline
+	 */
+	private void outputFoundEntries(TreeMap<Integer,TreeMap<Integer,String>> foundEntries,
+			String line, BufferedWriter outStream) throws IOException {
+		outStream.write(line); outStream.newLine();
+		for (Map.Entry<Integer, TreeMap<Integer,String>> entry : foundEntries.entrySet()) {
+			Integer start = entry.getKey();
+			// Always only one value ?
+			for (Map.Entry<Integer, String> value : entry.getValue().entrySet()) {
+				Integer end = value.getKey();
+				String type = value.getValue();
+				outStream.write(line.substring(start, end));
+				outStream.write(":"+type);
+				outStream.newLine();
+			}
+		}	
+		outStream.newLine();
+	}
 
-	public void withCorpusFileQueryTrie(File filename) throws IOException {
+	public void withCorpusFileQueryTrie(File filename, BufferedWriter writer) throws IOException {
 
 		String line = "";
 		BufferedReader reader = new BufferedReader(new InputStreamReader(new FileInputStream(filename), "utf-8"));
@@ -81,24 +117,24 @@ public class TrieDirectoryRunner {
 
 		while ((line = reader.readLine()) != null) {
 			
-			queryWithTrie(dictionary, line); 
+			outputFoundEntries(queryWithTrie(dictionary, line), line, writer);
 		}
 
 		time2 = System.currentTimeMillis();
 		System.out.println("System time (msec): " + (time2 - time1));
 
 		reader.close();
-	}
-
-	private void queryWithTrie(String dictionary2, String line) {
-		trie.getTrie().getSubstringLongestMatch(line, false, false);	
 		
 	}
-	
-	public void processAmpCorpusDir(String inDir) throws IOException {
-		File path = new File(inDir);
 
+	
+	
+	public void processAmpCorpusDir(String inDir, String outfilename) throws IOException {
+		File path = new File(inDir);
 		File[] files = path.listFiles();
+		
+		File outFile = new File(outfilename);
+		BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(outFile), "utf-8"));
 		
 		long time1;
 		long time2;
@@ -107,9 +143,10 @@ public class TrieDirectoryRunner {
 		
 		for (int i = 0; i < files.length; i++) {
 			if (files[i].isFile()) {
-				this.withCorpusFileQueryTrie(files[i]);
+				this.withCorpusFileQueryTrie(files[i], writer);
 			}
 		}
+		writer.close();
 		time2 = System.currentTimeMillis();
 		System.out.println("System time (msec) whole corpus: " + (time2 - time1));
 	}
@@ -122,7 +159,7 @@ public class TrieDirectoryRunner {
 		System.out.println("Nodes " + counts[0] + "; Entries " + counts[1]);
 		
 
-		testRun.processAmpCorpusDir(testRun.inDir);
+		testRun.processAmpCorpusDir(testRun.inDir, testRun.outFile);
 
 	}
 

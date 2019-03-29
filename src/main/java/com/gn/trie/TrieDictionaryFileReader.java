@@ -17,7 +17,7 @@ import com.gn.trie.Trie;
  * <p>Currently, two modes are supported when a trie entry is determined
  * 	 <p>- the NE is tokenized and each token defines its own trie-entry
  *   <p>- the whole NE is used as entry.
- *   <p>- NOTE: in principle, we can also have a mixed of both
+ *   <p>- NOTE: in principle, we can also have a mix of both
  *  <p>- the flag tokenized triggers between the modes
  *  <p>The enum type DictType is used to handle different formats. Currently supported are
  *  <p>- SIMPLE:
@@ -28,6 +28,7 @@ import com.gn.trie.Trie;
  *   	<p>- each line represents a nemex entry
  *      <p>- each can have different type readings
  *      <p>- in this case the type info is computed
+ *  <p> BOOLEAN lowercase: lower case whole entry before it is entered into the trie
  *  
  *  <p>MISSING:
  *  	<p>- parsing of an entry in order to identify noise
@@ -41,6 +42,7 @@ public class TrieDictionaryFileReader {
 	private String fromEncoding = "UTF-8";
 	private String neType = "PER";
 	private boolean tokenized = true;
+	private boolean lowerCase = true;
 	public static enum DictType {SIMPLE, NEMEX};
 	private DictType dictType = DictType.SIMPLE;
 	private  int counter = 0;
@@ -91,18 +93,24 @@ public class TrieDictionaryFileReader {
 	}
 
 	// Initialization
-
+	
 	public TrieDictionaryFileReader(){
 	}
 
-	public TrieDictionaryFileReader(String inFile, String neType){
+	public TrieDictionaryFileReader(boolean lowerCase){
+		this.lowerCase = lowerCase;
+	}
+	
+	public TrieDictionaryFileReader(String inFile, String neType, boolean lowerCase){
 		this.setFromFile(inFile);
 		this.setNeType(neType);
+		this.lowerCase = lowerCase;
 	}
 
-	public TrieDictionaryFileReader(String inFile, String neType, boolean tokenized){
+	public TrieDictionaryFileReader(String inFile, String neType, boolean lowerCase, boolean tokenized){
 		this.setFromFile(inFile);
 		this.setNeType(neType);
+		this.lowerCase = lowerCase;
 		this.setTokenized(tokenized);
 	}
 
@@ -175,7 +183,7 @@ public class TrieDictionaryFileReader {
 	private void computeFromSimpleEntry(String line, String neType){
 		if (!line.isEmpty())
 		{
-			String segment = line;
+			String segment = (this.lowerCase)?line.toLowerCase():line;
 			if (this.isTokenized()){
 				this.processTokenizedSegment(segment, neType);
 			}
