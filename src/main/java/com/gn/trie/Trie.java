@@ -286,7 +286,7 @@ public class Trie<E> extends AbstractSet<CharSequence> {
 		else System.out.println("No entry for " + s);
 	}
 
-	private void traverseParents (Trie<E> trie){
+	public void traverseParents (Trie<E> trie){
 		System.out.println("get up");
 		if (trie.getChildren() != null) System.out.println(trie.getChildren().toString());
 		if (trie.getParent()==null) {System.out.println("reached root!");}

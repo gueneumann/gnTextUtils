@@ -36,3 +36,7 @@ a useful set of text-oriented java utils
 - eventually use it in NEMEX
 
 - use in GNT
+
+## Testing TrieDirectoryRunner with Amplexor data:
+
+- takes about 17 seconds to run whole corpus
