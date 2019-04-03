@@ -33,7 +33,7 @@ public class TestPalign {
 				palign.dp(s, t));
 		long time2 = System.currentTimeMillis();
 		System.out.println("System time (msec): " + (time2-time1));
-		//palign.printDistanceMatrix();
+		palign.printDistanceMatrix();
 	}
 
 	public static void testLalign(String s, String t) {
@@ -67,14 +67,14 @@ public class TestPalign {
 	}
 
 	public static void main(String[] args) {
-		//TestPalign.testPalign("kaushic chaduri", "kaushuk chadhui");
+		TestPalign.testPalign("caushit chakrab", "kaushit chekrab");
 		//TestPalign.testLalign("ART", "HATGgAFFFATGABBB");
 		//TestPalign.testPalign("brachers", "brachels");
 		//TestPalign.testLalign("brachers", "brachels");
 		//TestPalign.testLalign("brecher", "brachers");
-		TestPalign.testPalign(
-				"3 weeks after the last dose of the combination of nivolumab and ipilimumab if using 240 mg every 2 weeks; or", 
-				"6 weeks after the last dose of the combination of nivolumab and ipilimumab if using 480 mg every 4 weeks.");
+//		TestPalign.testPalign(
+//				"3 weeks after the last dose of the combination of nivolumab and ipilimumab if using 240 mg every 2 weeks; or", 
+//				"6 weeks after the last dose of the combination of nivolumab and ipilimumab if using 480 mg every 4 weeks.");
 		//TestPalign.testPalign("kleiner Pual", "kleine Paula   ");
 
 	}

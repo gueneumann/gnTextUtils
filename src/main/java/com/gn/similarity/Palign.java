@@ -149,7 +149,7 @@ public class Palign {
 			return prevCost+getReplacementWeight();
 	}
 
-	// Printing is not adjusted with different digit sizes of integers
+	// TODO Printing is not adjusted with different digit sizes of integers
 	public void printDistanceMatrix () {
 		System.out.print("  ");
 		for (int i = 0; i < getTargetString().length(); i++) {
@@ -158,6 +158,7 @@ public class Palign {
 		System.out.println();
 		for (int i = 0; i < getSourceString().length(); i++) {
 			System.out.print(getSourceString().charAt(i)+" ");
+			
 			for (int j = 0; j < getTargetString().length(); j++) {
 				System.out.print(distanceMatrix[i][j]+" ");
 			}
