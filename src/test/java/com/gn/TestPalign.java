@@ -31,6 +31,8 @@ public class TestPalign {
 		long time1 = System.currentTimeMillis();
 		System.out.println("Distance number: " + 
 				palign.dp(s, t));
+		System.out.println("Distance similarity: " + 
+				palign.computeEditSimilarity());
 		long time2 = System.currentTimeMillis();
 		System.out.println("System time (msec): " + (time2-time1));
 		palign.printDistanceMatrix();
@@ -68,6 +70,10 @@ public class TestPalign {
 
 	public static void main(String[] args) {
 		TestPalign.testPalign("caushit chakrab", "kaushit chekrab");
+		TestPalign.testPalign("surajit chaudri", "kaushit chekrab");
+		TestPalign.testPalign("caushit chaudui", "kaushit chekrab");
+
+		
 		//TestPalign.testLalign("ART", "HATGgAFFFATGABBB");
 		//TestPalign.testPalign("brachers", "brachels");
 		//TestPalign.testLalign("brachers", "brachels");

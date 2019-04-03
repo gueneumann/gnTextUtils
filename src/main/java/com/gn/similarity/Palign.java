@@ -148,6 +148,11 @@ public class Palign {
 		else
 			return prevCost+getReplacementWeight();
 	}
+	
+	public float computeEditSimilarity() {
+		float similarity = (float) (1.0 - ((float) this.getDistance()  / Math.max(this.s1.length(), this.s2.length())));
+		return similarity;
+	}
 
 	// TODO Printing is not adjusted with different digit sizes of integers
 	public void printDistanceMatrix () {
@@ -164,7 +169,7 @@ public class Palign {
 			}
 			System.out.println();
 		}
-		System.out.println();
+		System.out.println();	
 	}
 
 	/**
