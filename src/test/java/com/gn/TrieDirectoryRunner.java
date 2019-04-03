@@ -98,7 +98,7 @@ public class TrieDirectoryRunner {
 			for (Map.Entry<Integer, String> value : entry.getValue().entrySet()) {
 				Integer end = value.getKey();
 				String type = value.getValue();
-				outStream.write(line.substring(start, end));
+				outStream.write("["+start+","+end+"]:"+line.substring(start, end));
 				outStream.write(":"+type);
 				outStream.newLine();
 			}

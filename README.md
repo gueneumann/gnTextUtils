@@ -52,3 +52,15 @@ a useful set of text-oriented java utils
 - handle prober treatment of lower case 
 
 - add edit distance function
+
+## Implement TASTE like approach:
+
+-	store entries in form of partitions taking into account ED threshold as parameter
+
+-	store each entry which shares a partition (similar to ngram index in Faerie)
+
+-	for document, get all possible matches
+
+-	now find optimal chains of matches that are similar under given ED
+
+-	this would be done by extending the found segments to find similar entries
