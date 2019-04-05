@@ -38,12 +38,14 @@ import com.gn.trie.TrieDictionaryFileReader.DictType;
 public class TrieDirectoryRunner {
 	
 	private int fileCnt = 0;
-
-	public String inDir = "/local/data/AmplexorData/EMA_EPAR_sentences";
-
-	public String dictionary = "/local/data/AmplexorData/CSD_Data_Delivery_v1/Controlled_Vocabulary/entriesType-nemex.txt";
 	
-	public String outFile = "/local/data/AmplexorData/EMA_EPAR_trieMatches.txt";
+	public String mainDir = "/Users/gune00/data/";
+
+	public String inDir = mainDir + "AmplexorData/EMA_EPAR_sentences";
+
+	public String dictionary = mainDir + "AmplexorData/CSD_Data_Delivery_v1/Controlled_Vocabulary/entriesType-nemex.txt";
+	
+	public String outFile = mainDir + "AmplexorData/EMA_EPAR_trieMatches.txt";
 	
 	public TrieDictionaryFileReader trie = new TrieDictionaryFileReader();
 
